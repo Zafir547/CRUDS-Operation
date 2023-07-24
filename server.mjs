@@ -1,6 +1,15 @@
 import express from "express";
 import { customAlphabet } from 'nanoid'
 const nanoid = customAlphabet('1234567890', 20)
+import { MongoClient } from "mongodb"
+
+import './config/index.mjs'
+
+const mongodbURI = "mongodb+srv://zafirabdullah1534:DellInspiren990@cluster0.ishtbna.mongodb.net/?retryWrites=true&w=majority"
+const client = new MongoClient(mongodbURI);
+const database = client.db('ecom');
+const productCollection = database.collection('products');
+
 
 
 const app = express();
@@ -20,11 +29,18 @@ let products = [
     }
 ];
 
-app.get("/products", (req, res) => {
+app.get("/products", async (req, res) => {
+    console.log("get running");
+    const result = await productCollection.find({}).toArray()
+    console.log("result ",result);
+    //  .then((result)=>{
     res.send({
         message: "all products",
-        data: products,
+        data: result,
     });
+    //  })
+
+
 });
 
 //  https://baseurl.com/product/1231
@@ -51,13 +67,13 @@ app.get("/product/:i", (req, res) => {
         });
     } else {
         res.send({
-        message: "product not found with id: " + products[isFound].id,
-        data:products[isFound]
-      });
+            message: "product not found with id: " + products[isFound].id,
+            data: products[isFound]
+        });
     }
 });
 
-app.post("/product", (req, res) => {
+app.post("/product", async (req, res) => {
     // {
     //     id: 212342, // Always a number
     //     name: "AI product",
@@ -71,23 +87,27 @@ app.post("/product", (req, res) => {
 
 
 
-            res.status(403).send(`
+        res.status(403).send(`
               required parameter missing. example JSON request body:
               {
                 name: "AI product",
                 price: "$50.25",
                 description: "AI product description" 
               }`);
-        }
+    }
 
-        products.push({
-            id: nanoid(),
-            name: req.body.name,
-            price: req.body.price,
-            description: req.body.description,
-        });
-
+    await productCollection.insertOne({
+        name: req.body.name,
+        price: req.body.price,
+        description: req.body.description,
+    }).then(() => {
         res.status(201).send({ message: "created product" });
+
+    }).catch((error) => {
+        res.status(500).send({ error });
+
+    })
+
 });
 
 app.put("/product/:id", (req, res) => {
@@ -105,44 +125,15 @@ app.put("/product/:id", (req, res) => {
             name: "AI product",
             price: "$50.25",
             description: "AI product description" 
-          }`);   
-        }
+          }`);
+    }
 
 
-
-        let isFound = false;
-
-        for (let i = 0; i < products.length; i++) {
-            if (products[i].id === req.params.id) {
-                isFound = i;
-                break;
-            }
-        }
-
-        if (isFound === false) {
-             res.status(404);
-             res.send({
-                message: "product not found"
-            });
-        } else {
-            if (req.body.name) products[isFound].name = req.body.name
-            if (req.body.price) products[isFound].price = req.body.price
-            if (req.body.description) products[isFound].description = req.body.description
-
-            res.send({
-                message: "product is updated with id: " + products[isFound].id,
-                data: products[isFound]
-            });
-        }
-
-});
-
-app.delete("/product/:id", (req, res) => {
 
     let isFound = false;
 
     for (let i = 0; i < products.length; i++) {
-        if (products[i].id === req.params.id){
+        if (products[i].id === req.params.id) {
             isFound = i;
             break;
         }
@@ -153,7 +144,36 @@ app.delete("/product/:id", (req, res) => {
         res.send({
             message: "product not found"
         });
-    }   else {
+    } else {
+        if (req.body.name) products[isFound].name = req.body.name
+        if (req.body.price) products[isFound].price = req.body.price
+        if (req.body.description) products[isFound].description = req.body.description
+
+        res.send({
+            message: "product is updated with id: " + products[isFound].id,
+            data: products[isFound]
+        });
+    }
+
+});
+
+app.delete("/product/:id", (req, res) => {
+
+    let isFound = false;
+
+    for (let i = 0; i < products.length; i++) {
+        if (products[i].id === req.params.id) {
+            isFound = i;
+            break;
+        }
+    }
+
+    if (isFound === false) {
+        res.status(404);
+        res.send({
+            message: "product not found"
+        });
+    } else {
         products.splice(isFound, 1)
 
         res.send({
