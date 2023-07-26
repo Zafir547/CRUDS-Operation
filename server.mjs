@@ -23,9 +23,9 @@ app.get("/", (req, res) => {
 let products = [
     {
         id: nanoid(), // Always a number
-        name: "AI product",
-        price: "$50.25",
-        description: "AI product description"
+        name: "Laptop",
+        price: "$300",
+        description: "The Laptop is a good product"
     }
 ];
 
@@ -44,7 +44,7 @@ app.get("/products", async (req, res) => {
 });
 
 //  https://baseurl.com/product/1231
-app.get("/product/:i", (req, res) => {
+app.get("/product/:id", (req, res) => {
     console.log(typeof req.params.id)
 
     if (isNaN(req.params.id)) {
@@ -90,9 +90,9 @@ app.post("/product", async (req, res) => {
         res.status(403).send(`
               required parameter missing. example JSON request body:
               {
-                name: "AI product",
-                price: "$50.25",
-                description: "AI product description" 
+                name: "Laptop",
+                price: "$300",
+                description: "The Laptop is a good product"
               }`);
     }
 
@@ -122,9 +122,9 @@ app.put("/product/:id", (req, res) => {
           atleast one parameter is required: name, price or description to complete update
           example a JSON request body:
           {
-            name: "AI product",
-            price: "$50.25",
-            description: "AI product description" 
+            name: "Laptop",
+            price: "$300",
+            description: "The Laptop is a good product" 
           }`);
     }
 
