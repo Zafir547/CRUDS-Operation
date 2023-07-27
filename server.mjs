@@ -2,7 +2,7 @@ import express from "express";
 import { customAlphabet } from 'nanoid'
 const nanoid = customAlphabet('1234567890', 20)
 import { MongoClient, ObjectId } from "mongodb"
-
+import cors from "cors"
 import './config/index.mjs'
 
 const mongodbURI = "mongodb+srv://zafirabdullah1534:DellInspiren990@cluster0.ishtbna.mongodb.net/?retryWrites=true&w=majority"
@@ -12,7 +12,10 @@ const productCollection = database.collection('products');
 
 
 
+
 const app = express();
+app.use(cors())
+
 app.use(express.json());
 
 app.get("/", (req, res) => {
