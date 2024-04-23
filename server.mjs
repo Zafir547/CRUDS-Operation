@@ -5,7 +5,7 @@ import { MongoClient, ObjectId } from "mongodb"
 import cors from "cors"
 import './config/index.mjs'
 
-const mongodbURI = "mongodb+srv://zafirabdullah1534:DellInspiren990@cluster0.ishtbna.mongodb.net/?retryWrites=true&w=majority"
+const mongodbURI = "mongodb+srv://zafirabdullah1534:DellInspiren990@cluster0.beky4vw.mongodb.net/?retryWrites=true&w=majority"
 const client = new MongoClient(mongodbURI);
 const database = client.db('ecom');
 const productCollection = database.collection('products');
